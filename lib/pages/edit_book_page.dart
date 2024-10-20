@@ -13,6 +13,7 @@ import 'package:readeth/pages/book_detail_page.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:readeth/utils/show_toast.dart';
 import 'package:path/path.dart';
+import 'package:file_picker/file_picker.dart';
 
 class EditBookPage extends StatefulWidget {
   final BookModel book;
@@ -31,6 +32,7 @@ class _EditBookPageState extends State<EditBookPage> {
   String publishDate = '';
   String selectedGenre = '';
   String? coverImagePath;
+  String? pdfFilePath; // Add this variable to store the PDF file path
 
   File? _imageFile; // This will hold the new selected image
   final ImagePicker imagePicker = ImagePicker();
@@ -47,6 +49,8 @@ class _EditBookPageState extends State<EditBookPage> {
       publishDate = widget.book.publishDate;
       selectedGenre = widget.book.genre;
       coverImagePath = widget.book.coverImage; // Original cover image
+      pdfFilePath =
+          widget.book.pdfFile; // Initialize with the original PDF path
     });
   }
 
@@ -62,6 +66,19 @@ class _EditBookPageState extends State<EditBookPage> {
         _imageFile =
             savedImage; // Update the image file with the newly picked image
         coverImagePath = savedImage.path; // Update the cover image path
+      });
+    }
+  }
+
+  Future<void> _pickPdf() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['pdf'],
+    );
+
+    if (result != null && result.files.isNotEmpty) {
+      setState(() {
+        pdfFilePath = result.files.single.path!; // Store the new PDF file path
       });
     }
   }
@@ -180,6 +197,17 @@ class _EditBookPageState extends State<EditBookPage> {
                     ),
                   ),
                   const SizedBox(height: 20),
+                  // Button to upload a new PDF
+                  ElevatedButton(
+                    onPressed: _pickPdf,
+                    child: const Text('Upload PDF'),
+                  ),
+                  if (pdfFilePath != null && pdfFilePath!.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: Text('Selected PDF: ${basename(pdfFilePath!)}'),
+                    ),
+                  const SizedBox(height: 20),
                   BlocBuilder<BookBloc, BookState>(
                     builder: (context, state) {
                       return GestureDetector(
@@ -196,6 +224,8 @@ class _EditBookPageState extends State<EditBookPage> {
                                     publishDate: publishDate,
                                     coverImage:
                                         coverImagePath, // Ensure this is set
+                                    pdfFile:
+                                        pdfFilePath, // Add the PDF file path here
                                   );
                                   context
                                       .read<BookBloc>()
