@@ -30,7 +30,7 @@ class AppDrawer extends StatelessWidget {
         baseStyle: const TextStyle(),
         selectedStyle: const TextStyle(),
       ),
-      const AboutUsPage(),
+      AboutUsPage(),
     )
   ];
 
