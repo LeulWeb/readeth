@@ -58,4 +58,12 @@ class BookBloc extends Bloc<BookEvent, BookState> {
       emit(BookError(e.toString()));
     }
   }
+
+  @override
+  void onChange(Change<BookState> change) {
+    // TODO: implement onChange
+    super.onChange(change);
+    print(change.currentState.toString());
+    print(change.nextState.toString());
+  }
 }

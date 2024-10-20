@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
 import 'package:readeth/bloc/book_bloc.dart';
 import 'package:readeth/bloc/book_event.dart';
 import 'package:readeth/bloc/book_state.dart';
@@ -133,6 +134,8 @@ class _AddBookPageState extends State<AddBookPage> {
                                     publishDate: publishDate,
                                     genre: selectedGenre,
                                   );
+
+                                  Logger().d(book.toString());
                                   context
                                       .read<BookBloc>()
                                       .add(AddBookEvent(book));

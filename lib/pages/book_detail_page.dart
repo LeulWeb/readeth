@@ -54,6 +54,7 @@ class BookDetailPage extends StatelessWidget {
                     ),
                   ),
                   Text(book.author),
+                  Text(book.genre),
                   Text(
                     book.description,
                     textAlign: TextAlign.justify,
@@ -114,7 +115,6 @@ class BookDetailPage extends StatelessWidget {
 
 // show confirmation modal
 void showModal(BuildContext context, BookModel book) {
-
   showDialog(
       context: context,
       builder: (context) {

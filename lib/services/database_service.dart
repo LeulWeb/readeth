@@ -50,9 +50,12 @@ class DatabaseService {
     await db.insert(tableName, {
       columnTitle: book.title,
       columnAuthor: book.author,
+      columnGenre: book.genre,
       columnDescription: book.description,
       columnPublishDate: book.publishDate,
     });
+
+    Logger().d(book.toString());
   }
 
   Future<List<BookModel>> getBooks() async {

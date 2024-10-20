@@ -24,7 +24,7 @@ class _EditBookPageState extends State<EditBookPage> {
   String author = '';
   String description = '';
   String publishDate = '';
-  String selectedGenre = 'Miscellaneous';
+  String selectedGenre = '';
 
   @override
   void initState() {
@@ -76,6 +76,7 @@ class _EditBookPageState extends State<EditBookPage> {
                     height: 20,
                   ),
                   DropdownButtonFormField(
+                    value: selectedGenre,
                     decoration: const InputDecoration(
                       labelText: "Genre",
                     ),
@@ -146,6 +147,7 @@ class _EditBookPageState extends State<EditBookPage> {
                                     id: widget.book.id,
                                     title: title,
                                     author: author,
+                                    genre: selectedGenre,
                                     description: description,
                                     publishDate: publishDate,
                                   );

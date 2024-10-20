@@ -21,6 +21,10 @@ class HomePage extends StatelessWidget {
             child: BlocBuilder<BookBloc, BookState>(
               builder: (context, state) {
                 if (state is BookLoaded) {
+                  if (state.books.isEmpty) {
+                    return const Center(child: Text("No books available"));
+                  }
+
                   return GridView.builder(
                     itemCount: state.books.length,
                     gridDelegate:
