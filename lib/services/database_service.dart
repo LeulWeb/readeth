@@ -34,6 +34,7 @@ class DatabaseService {
          CREATE TABLE $tableName (
           $columnId INTEGER PRIMARY KEY AUTOINCREMENT,
           $columnTitle TEXT NOT NULL,
+          $columnPdfFile TEXT,
           $columnCoverImage TEXT,
           $columnGenre TEXT NOT NULL,
           $columnAuthor TEXT NOT NULL,
@@ -55,6 +56,7 @@ class DatabaseService {
       columnCoverImage: book.coverImage,
       columnDescription: book.description,
       columnPublishDate: book.publishDate,
+      columnPdfFile: book.pdfFile,
     });
 
     Logger().d(book.toString());
@@ -83,6 +85,7 @@ class DatabaseService {
           columnCoverImage: book.coverImage,
           columnDescription: book.description,
           columnPublishDate: book.publishDate,
+          columnPdfFile: book.pdfFile,
         },
         where: "$columnId = ?",
         whereArgs: [book.id]);

@@ -13,6 +13,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:readeth/utils/show_toast.dart';
 import 'package:readeth/widgets/app_drawer.dart';
 import 'package:path/path.dart';
+import 'package:file_picker/file_picker.dart';
 
 class AddBookPage extends StatefulWidget {
   const AddBookPage({super.key});
@@ -30,6 +31,7 @@ class _AddBookPageState extends State<AddBookPage> {
   String publishDate = '';
   String selectedGenre = 'Miscellaneous';
   String coverImagePath = '';
+  String pdfFilePath = ''; // Variable for storing PDF file path
 
   File? _imageFile;
   final ImagePicker imagePicker = ImagePicker();
@@ -51,6 +53,20 @@ class _AddBookPageState extends State<AddBookPage> {
     }
   }
 
+  Future<void> _pickPdf() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['pdf'],
+    );
+
+    if (result != null && result.files.isNotEmpty) {
+      setState(() {
+        pdfFilePath = result.files.single.path!; // Store the PDF file path
+      });
+      Logger().d('PDF selected at: $pdfFilePath'); // Log the path for debugging
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -62,7 +78,6 @@ class _AddBookPageState extends State<AddBookPage> {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: ListView(
-          // Removed Expanded here, ListView already takes up available space
           children: [
             Form(
               key: _formKey,
@@ -80,13 +95,11 @@ class _AddBookPageState extends State<AddBookPage> {
                     },
                     onChanged: (value) {
                       setState(() {
-                        title = value.trim(); // Fixed assignment
+                        title = value.trim();
                       });
                     },
                   ),
-                  const SizedBox(
-                    height: 20,
-                  ),
+                  const SizedBox(height: 20),
                   DropdownButtonFormField(
                     decoration: const InputDecoration(
                       labelText: "Genre",
@@ -104,9 +117,7 @@ class _AddBookPageState extends State<AddBookPage> {
                       });
                     },
                   ),
-                  const SizedBox(
-                    height: 20,
-                  ),
+                  const SizedBox(height: 20),
                   TextFormField(
                     decoration: const InputDecoration(
                       labelText: "Author",
@@ -119,13 +130,11 @@ class _AddBookPageState extends State<AddBookPage> {
                     },
                     onChanged: (value) {
                       setState(() {
-                        author = value.trim(); // Fixed assignment
+                        author = value.trim();
                       });
                     },
                   ),
-                  const SizedBox(
-                    height: 20,
-                  ),
+                  const SizedBox(height: 20),
                   TextFormField(
                     decoration: const InputDecoration(
                       labelText: "Description",
@@ -139,13 +148,11 @@ class _AddBookPageState extends State<AddBookPage> {
                     maxLines: 3,
                     onChanged: (value) {
                       setState(() {
-                        description = value.trim(); // Fixed assignment
+                        description = value.trim();
                       });
                     },
                   ),
-                  const SizedBox(
-                    height: 20,
-                  ),
+                  const SizedBox(height: 20),
                   if (_imageFile != null)
                     Container(
                       width: 200,
@@ -168,9 +175,17 @@ class _AddBookPageState extends State<AddBookPage> {
                       ),
                     ),
                   ),
-                  const SizedBox(
-                    height: 20,
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: _pickPdf,
+                    child: const Text('Upload PDF'),
                   ),
+                  if (pdfFilePath.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: Text('Selected PDF: ${basename(pdfFilePath)}'),
+                    ),
+                  const SizedBox(height: 20),
                   BlocBuilder<BookBloc, BookState>(
                     builder: (context, state) {
                       return GestureDetector(
@@ -185,15 +200,15 @@ class _AddBookPageState extends State<AddBookPage> {
                                     publishDate: publishDate,
                                     genre: selectedGenre,
                                     coverImage: coverImagePath,
+                                    pdfFile: pdfFilePath, // Add this line
                                   );
 
-                                  Logger().d(book.toString());
+                                  Logger().e(book.toString());
                                   context
                                       .read<BookBloc>()
                                       .add(AddBookEvent(book));
                                   Navigator.of(context).push(MaterialPageRoute(
                                       builder: (context) => AppDrawer()));
-                                  // show snack bar message
                                   showScaffoldSnackBar(context,
                                       "${book.title} is added", Colors.green);
                                 }
@@ -220,10 +235,10 @@ class _AddBookPageState extends State<AddBookPage> {
                         ),
                       );
                     },
-                  )
+                  ),
                 ],
               ),
-            )
+            ),
           ],
         ),
       ),

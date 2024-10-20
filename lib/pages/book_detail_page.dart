@@ -6,6 +6,7 @@ import 'package:readeth/bloc/book_event.dart';
 import 'package:readeth/models/book_model.dart';
 import 'package:readeth/pages/edit_book_page.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:readeth/pages/pdf_viewer_page.dart';
 
 import 'package:readeth/utils/show_toast.dart';
 import 'package:readeth/widgets/app_drawer.dart';
@@ -111,6 +112,23 @@ class BookDetailPage extends StatelessWidget {
                         textAlign: TextAlign.justify,
                       ),
                       Text(book.publishDate),
+
+                      if (File(book.pdfFile!).existsSync())
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.of(context).push(MaterialPageRoute(
+                                builder: (context) =>
+                                    PdfViewerPage(pdfPath: book.pdfFile!)));
+                          },
+                          child: const Text(
+                            "View PDF",
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: Colors.blue,
+                            ),
+                          ),
+                        ),
+
                       GestureDetector(
                         onTap: () {
                           showModal(context, book);
