@@ -1,4 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:logger/logger.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:readeth/bloc/book_bloc.dart';
 import 'package:readeth/bloc/book_event.dart';
 import 'package:readeth/bloc/book_state.dart';
@@ -8,6 +13,7 @@ import 'package:readeth/pages/book_detail_page.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:readeth/utils/show_toast.dart';
+import 'package:path/path.dart';
 
 class EditBookPage extends StatefulWidget {
   final BookModel book;
@@ -25,18 +31,40 @@ class _EditBookPageState extends State<EditBookPage> {
   String description = '';
   String publishDate = '';
   String selectedGenre = '';
+  String? coverImagePath;
+
+  File? _imageFile; // This will hold the new selected image
+  final ImagePicker imagePicker = ImagePicker();
 
   @override
   void initState() {
     super.initState();
 
+    // Initialize form fields with data from the book model
     setState(() {
       title = widget.book.title;
       author = widget.book.author;
       description = widget.book.description;
       publishDate = widget.book.publishDate;
       selectedGenre = widget.book.genre;
+      coverImagePath = widget.book.coverImage; // Original cover image
     });
+  }
+
+  Future<void> _pickImage() async {
+    final pickedFile = await imagePicker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      final appDir = await getApplicationDocumentsDirectory();
+      final fileName = basename(pickedFile.path);
+      final savedImage =
+          await File(pickedFile.path).copy('${appDir.path}/$fileName');
+
+      setState(() {
+        _imageFile =
+            savedImage; // Update the image file with the newly picked image
+        coverImagePath = savedImage.path; // Update the cover image path
+      });
+    }
   }
 
   @override
@@ -49,7 +77,6 @@ class _EditBookPageState extends State<EditBookPage> {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: ListView(
-          // Removed Expanded here, ListView already takes up available space
           children: [
             Form(
               key: _formKey,
@@ -68,15 +95,13 @@ class _EditBookPageState extends State<EditBookPage> {
                     },
                     onChanged: (value) {
                       setState(() {
-                        title = value.trim(); // Fixed assignment
+                        title = value.trim();
                       });
                     },
                   ),
-                  const SizedBox(
-                    height: 20,
-                  ),
+                  const SizedBox(height: 20),
                   DropdownButtonFormField(
-                    value: selectedGenre,
+                    value: selectedGenre.isEmpty ? null : selectedGenre,
                     decoration: const InputDecoration(
                       labelText: "Genre",
                     ),
@@ -92,9 +117,7 @@ class _EditBookPageState extends State<EditBookPage> {
                       });
                     },
                   ),
-                  const SizedBox(
-                    height: 20,
-                  ),
+                  const SizedBox(height: 20),
                   TextFormField(
                     initialValue: author,
                     decoration: const InputDecoration(
@@ -108,13 +131,11 @@ class _EditBookPageState extends State<EditBookPage> {
                     },
                     onChanged: (value) {
                       setState(() {
-                        author = value.trim(); // Fixed assignment
+                        author = value.trim();
                       });
                     },
                   ),
-                  const SizedBox(
-                    height: 20,
-                  ),
+                  const SizedBox(height: 20),
                   TextFormField(
                     initialValue: description,
                     decoration: const InputDecoration(
@@ -129,13 +150,37 @@ class _EditBookPageState extends State<EditBookPage> {
                     maxLines: 3,
                     onChanged: (value) {
                       setState(() {
-                        description = value.trim(); // Fixed assignment
+                        description = value.trim();
                       });
                     },
                   ),
-                  const SizedBox(
-                    height: 20,
+                  const SizedBox(height: 20),
+                  // Display the cover image
+                  if (coverImagePath != null && coverImagePath!.isNotEmpty)
+                    Container(
+                      width: 200,
+                      height: 200,
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: _imageFile != null
+                              ? FileImage(
+                                  _imageFile!) // Display the new image if selected
+                              : FileImage(File(
+                                  coverImagePath!)), // Otherwise, display the original image
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                  GestureDetector(
+                    onTap: _pickImage,
+                    child: Container(
+                      child: IconButton(
+                        icon: const Icon(Icons.camera_alt_rounded),
+                        onPressed: _pickImage,
+                      ),
+                    ),
                   ),
+                  const SizedBox(height: 20),
                   BlocBuilder<BookBloc, BookState>(
                     builder: (context, state) {
                       return GestureDetector(
@@ -150,6 +195,8 @@ class _EditBookPageState extends State<EditBookPage> {
                                     genre: selectedGenre,
                                     description: description,
                                     publishDate: publishDate,
+                                    coverImage:
+                                        coverImagePath, // Ensure this is set
                                   );
                                   context
                                       .read<BookBloc>()
@@ -158,14 +205,13 @@ class _EditBookPageState extends State<EditBookPage> {
                                   Navigator.of(context).push(MaterialPageRoute(
                                       builder: (context) =>
                                           BookDetailPage(book: book)));
-                                  // show snack bar message
                                   showScaffoldSnackBar(context,
                                       "${book.title} is updated", Colors.green);
                                 }
                               },
                         child: Container(
                           decoration: BoxDecoration(
-                            color: Color(0xffFFF279),
+                            color: const Color(0xffFFF279),
                             borderRadius: BorderRadius.circular(10),
                           ),
                           width: double.infinity,
