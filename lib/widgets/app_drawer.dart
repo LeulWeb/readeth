@@ -38,6 +38,8 @@ class AppDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     return HiddenDrawerMenu(
       screens: pages,
+      backgroundColorAppBar: Colors.black,
+      isTitleCentered: true,
       backgroundColorMenu: Colors.black,
       backgroundMenu: DecorationImage(
         fit: BoxFit.cover,

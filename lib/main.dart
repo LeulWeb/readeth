@@ -13,6 +13,7 @@ class MyApp extends StatelessWidget {
       create: (context) => BookBloc()..add(GetBooksEvent()),
       child: MaterialApp(
         title: 'Readeth',
+        debugShowCheckedModeBanner: false,
         theme: ThemeData(
           brightness: Brightness.dark,
           scaffoldBackgroundColor: Colors.black,

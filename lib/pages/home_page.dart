@@ -6,6 +6,7 @@ import 'package:readeth/bloc/book_state.dart';
 import 'package:readeth/pages/book_detail_page.dart';
 
 import 'package:readeth/widgets/app_drawer.dart';
+import 'package:readeth/widgets/genre_widget.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -17,6 +18,7 @@ class HomePage extends StatelessWidget {
       drawer: AppDrawer(),
       body: Column(
         children: [
+          GenreWidget(),
           Expanded(
             child: BlocBuilder<BookBloc, BookState>(
               builder: (context, state) {
@@ -24,36 +26,38 @@ class HomePage extends StatelessWidget {
                   if (state.books.isEmpty) {
                     return const Center(child: Text("No books available"));
                   }
-
-                  return GridView.builder(
-                    itemCount: state.books.length,
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      crossAxisSpacing: 10,
-                      mainAxisSpacing: 10,
-                      childAspectRatio: 2 / 4,
-                    ),
-                    itemBuilder: (BuildContext context, int index) {
-                      return GestureDetector(
-                        onTap: () {
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) =>
-                                  BookDetailPage(book: state.books[index])));
-                        },
-                        child: GridTile(
-                          child: Column(
-                            children: [
-                              Image.network(
-                                  "https://m.media-amazon.com/images/I/71OVB8HknWL._AC_UF1000,1000_QL80_.jpg"),
-                              Text(state.books[index].title),
-                              Text(state.books[index].id.toString()),
-                              Text(state.books[index].author)
-                            ],
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                    child: GridView.builder(
+                      itemCount: state.books.length,
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 10,
+                        mainAxisSpacing: 10,
+                        childAspectRatio: 2 / 4,
+                      ),
+                      itemBuilder: (BuildContext context, int index) {
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.of(context).push(MaterialPageRoute(
+                                builder: (context) =>
+                                    BookDetailPage(book: state.books[index])));
+                          },
+                          child: GridTile(
+                            child: Column(
+                              children: [
+                                Image.network(
+                                    "https://m.media-amazon.com/images/I/71OVB8HknWL._AC_UF1000,1000_QL80_.jpg"),
+                                Text(state.books[index].title),
+                                Text(state.books[index].id.toString()),
+                                Text(state.books[index].author)
+                              ],
+                            ),
                           ),
-                        ),
-                      );
-                    },
+                        );
+                      },
+                    ),
                   );
                 } else if (state is BookLoading) {
                   return const Center(child: CircularProgressIndicator());
