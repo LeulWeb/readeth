@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:readeth/bloc/book_bloc.dart';
 import 'package:readeth/bloc/book_event.dart';
-import 'package:readeth/bloc/book_state.dart';
 import 'package:readeth/config/app_resources.dart';
 import 'package:readeth/config/genre_list.dart';
-import 'package:readeth/pages/book_detail_page.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class GenreWidget extends StatefulWidget {
