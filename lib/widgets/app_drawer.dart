@@ -6,34 +6,46 @@ import 'package:readeth/pages/add_book_page.dart';
 import 'package:readeth/pages/home_page.dart';
 
 // ignore: must_be_immutable
-class AppDrawer extends StatelessWidget {
+class AppDrawer extends StatefulWidget {
   AppDrawer({super.key});
 
-  List<ScreenHiddenDrawer> pages = [
-    ScreenHiddenDrawer(
-      ItemHiddenMenu(
-        name: "ReadEth",
-        baseStyle: const TextStyle(),
-        selectedStyle: const TextStyle(),
-      ),
-      HomePage(),
-    ),
-    ScreenHiddenDrawer(
+  @override
+  State<AppDrawer> createState() => _AppDrawerState();
+}
+
+class _AppDrawerState extends State<AppDrawer> {
+  List<ScreenHiddenDrawer> pages = [];
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    pages = [
+      ScreenHiddenDrawer(
         ItemHiddenMenu(
-          name: "Add Book",
+          name: "ReadEth",
           baseStyle: const TextStyle(),
           selectedStyle: const TextStyle(),
         ),
-        const AddBookPage()),
-    ScreenHiddenDrawer(
-      ItemHiddenMenu(
-        name: "About Us",
-        baseStyle: const TextStyle(),
-        selectedStyle: const TextStyle(),
+        HomePage(),
       ),
-      AboutUsPage(),
-    )
-  ];
+      ScreenHiddenDrawer(
+          ItemHiddenMenu(
+            name: "Add Book",
+            baseStyle: const TextStyle(),
+            selectedStyle: const TextStyle(),
+          ),
+          const AddBookPage()),
+      ScreenHiddenDrawer(
+        ItemHiddenMenu(
+          name: "About Us",
+          baseStyle: const TextStyle(),
+          selectedStyle: const TextStyle(),
+        ),
+        AboutUsPage(),
+      )
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {

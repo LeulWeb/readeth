@@ -15,6 +15,7 @@ import 'package:readeth/widgets/app_drawer.dart';
 import 'package:path/path.dart';
 import 'package:file_picker/file_picker.dart';
 
+
 class AddBookPage extends StatefulWidget {
   const AddBookPage({super.key});
 
@@ -207,15 +208,18 @@ class _AddBookPageState extends State<AddBookPage> {
                                   context
                                       .read<BookBloc>()
                                       .add(AddBookEvent(book));
-                                  Navigator.of(context).push(MaterialPageRoute(
-                                      builder: (context) => AppDrawer()));
+
+                                  Navigator.of(context).pushReplacement(
+                                      MaterialPageRoute(
+                                          builder: (context) => AppDrawer()));
+
                                   showScaffoldSnackBar(context,
                                       "${book.title} is added", Colors.green);
                                 }
                               },
                         child: Container(
                           decoration: BoxDecoration(
-                            color: Color(0xffFFF279),
+                            color: const Color(0xffFFF279),
                             borderRadius: BorderRadius.circular(10),
                           ),
                           width: double.infinity,

@@ -6,8 +6,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:readeth/bloc/book_bloc.dart';
 import 'package:readeth/bloc/book_state.dart';
 import 'package:readeth/pages/book_detail_page.dart';
-
-import 'package:readeth/widgets/app_drawer.dart';
 import 'package:readeth/widgets/genre_widget.dart';
 
 class HomePage extends StatelessWidget {
@@ -17,7 +15,7 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-      drawer: AppDrawer(),
+
       body: Column(
         children: [
           GenreWidget(),
