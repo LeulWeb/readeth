@@ -10,7 +10,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => BookBloc()..add(GetBooksEvent()),
+      create: (context) => BookBloc()..add(GetBooksEvent('All')),
       child: MaterialApp(
         title: 'Readeth',
         debugShowCheckedModeBanner: false,

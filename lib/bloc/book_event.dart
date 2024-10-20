@@ -20,4 +20,7 @@ class DeleteBookEvent extends BookEvent {
 }
 
 
-class GetBooksEvent extends BookEvent {}
+class GetBooksEvent extends BookEvent {
+  final String genre;
+  GetBooksEvent(this.genre);
+}

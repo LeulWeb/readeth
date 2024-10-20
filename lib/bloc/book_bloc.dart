@@ -16,6 +16,10 @@ class BookBloc extends Bloc<BookEvent, BookState> {
         emit(BookLoading());
         try {
           List<BookModel> books = await _databaseService.getBooks();
+
+          if (event.genre != 'All') {
+            books = books.where((book) => book.genre == event.genre).toList();
+          }
           emit(BookLoaded(books));
         } catch (e) {
           emit(BookError(e.toString()));
