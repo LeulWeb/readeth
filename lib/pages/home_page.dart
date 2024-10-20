@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:logger/logger.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import 'package:readeth/bloc/book_bloc.dart';
+import 'package:readeth/bloc/book_state.dart';
 import 'package:readeth/pages/book_detail_page.dart';
-import 'package:readeth/services/database_service.dart';
+
 import 'package:readeth/widgets/app_drawer.dart';
 
 class HomePage extends StatelessWidget {
-  final DatabaseService _databaseService = DatabaseService.instance;
-  HomePage({super.key});
+  const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -16,20 +18,11 @@ class HomePage extends StatelessWidget {
       body: Column(
         children: [
           Expanded(
-            // Only this Expanded is needed here
-            child: FutureBuilder(
-              future: _databaseService.getBooks(),
-              builder: (context, AsyncSnapshot snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError) {
-                  Logger().e(snapshot.error.toString());
-                  return const Center(child: Text("Error loading books"));
-                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return const Center(child: Text("No books available"));
-                } else {
+            child: BlocBuilder<BookBloc, BookState>(
+              builder: (context, state) {
+                if (state is BookLoaded) {
                   return GridView.builder(
-                    itemCount: snapshot.data?.length ?? 0,
+                    itemCount: state.books.length,
                     gridDelegate:
                         const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
@@ -42,22 +35,28 @@ class HomePage extends StatelessWidget {
                         onTap: () {
                           Navigator.of(context).push(MaterialPageRoute(
                               builder: (context) =>
-                                  BookDetailPage(book: snapshot.data![index])));
+                                  BookDetailPage(book: state.books[index])));
                         },
                         child: GridTile(
                           child: Column(
                             children: [
                               Image.network(
                                   "https://m.media-amazon.com/images/I/71OVB8HknWL._AC_UF1000,1000_QL80_.jpg"),
-                              Text(snapshot.data![index].title),
-                              Text(snapshot.data![index].id.toString()),
-                              Text(snapshot.data![index].author)
+                              Text(state.books[index].title),
+                              Text(state.books[index].id.toString()),
+                              Text(state.books[index].author)
                             ],
                           ),
                         ),
                       );
                     },
                   );
+                } else if (state is BookLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (state is BookError) {
+                  return const Center(child: Text("Error loading books"));
+                } else {
+                  return const Center(child: Text("No books available"));
                 }
               },
             ),

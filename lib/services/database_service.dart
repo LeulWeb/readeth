@@ -34,6 +34,7 @@ class DatabaseService {
          CREATE TABLE $tableName (
           $columnId INTEGER PRIMARY KEY AUTOINCREMENT,
           $columnTitle TEXT NOT NULL,
+          $columnGenre TEXT NOT NULL,
           $columnAuthor TEXT NOT NULL,
           $columnDescription TEXT NOT NULL,
           $columnPublishDate TEXT NOT NULL
@@ -73,6 +74,7 @@ class DatabaseService {
         {
           columnTitle: book.title,
           columnAuthor: book.author,
+          columnGenre: book.genre,
           columnDescription: book.description,
           columnPublishDate: book.publishDate,
         },

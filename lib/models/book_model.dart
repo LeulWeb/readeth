@@ -1,12 +1,14 @@
 class BookModel {
   final int? id;
   final String title;
+  final String genre;
   final String author;
   final String description;
   final String publishDate;
 
   BookModel({
-     this.id,
+    this.id,
+    this.genre = 'Miscellaneous',
     required this.title,
     required this.author,
     required this.description,
@@ -20,6 +22,8 @@ class BookModel {
       title: map['title'] as String? ??
           '', // Provide fallback empty string if null
       author: map['author'] as String? ?? '', // Fallback empty string
+      genre:
+          map['genre'] as String? ?? 'Miscellaneous', // Fallback empty string
       description: map['description'] as String? ?? '', // Fallback empty string
       publishDate: map['publishDate'] as String? ?? '', // Fallback empty string
     );
@@ -28,6 +32,6 @@ class BookModel {
   //to string
   @override
   String toString() {
-    return 'BookModel{id: $id, title: $title, author: $author, description: $description, publishDate: $publishDate}';
+    return 'BookModel{id: $id, title: $title, genre: $genre, author: $author, description: $description, publishDate: $publishDate}';
   }
 }

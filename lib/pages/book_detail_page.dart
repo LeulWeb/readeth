@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:readeth/bloc/book_bloc.dart';
+import 'package:readeth/bloc/book_event.dart';
 import 'package:readeth/models/book_model.dart';
 import 'package:readeth/pages/edit_book_page.dart';
-import 'package:readeth/services/database_service.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import 'package:readeth/utils/show_toast.dart';
+import 'package:readeth/widgets/app_drawer.dart';
 
 class BookDetailPage extends StatelessWidget {
   final BookModel book;
@@ -95,7 +100,8 @@ class BookDetailPage extends StatelessWidget {
         shape: const CircleBorder(),
         backgroundColor: const Color(0xffFFF279),
         onPressed: () {
-          Navigator.of(context).push(MaterialPageRoute(builder: (context) => EditBookPage(book: book)));
+          Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => EditBookPage(book: book)));
         },
         child: const Icon(
           Icons.edit,
@@ -108,7 +114,7 @@ class BookDetailPage extends StatelessWidget {
 
 // show confirmation modal
 void showModal(BuildContext context, BookModel book) {
-  final DatabaseService _databaseService = DatabaseService.instance;
+
   showDialog(
       context: context,
       builder: (context) {
@@ -127,14 +133,12 @@ void showModal(BuildContext context, BookModel book) {
             ),
             TextButton(
               onPressed: () async {
-                await _databaseService.deleteBook(book.id!);
+                context.read<BookBloc>().add(DeleteBookEvent(book));
                 Navigator.of(context).pop();
-                // show snackbar
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text("Book deleted"),
-                  ),
-                );
+                Navigator.of(context)
+                    .push(MaterialPageRoute(builder: (context) => AppDrawer()));
+                showScaffoldSnackBar(
+                    context, "${book.title} is deleted", Colors.red);
               },
               child: const Text(
                 "Yes, Sure",

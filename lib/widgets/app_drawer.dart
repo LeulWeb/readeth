@@ -4,6 +4,7 @@ import 'package:readeth/pages/about_us_page.dart';
 import 'package:readeth/pages/add_book_page.dart';
 import 'package:readeth/pages/home_page.dart';
 
+// ignore: must_be_immutable
 class AppDrawer extends StatelessWidget {
   AppDrawer({super.key});
 
@@ -14,7 +15,7 @@ class AppDrawer extends StatelessWidget {
         baseStyle: const TextStyle(),
         selectedStyle: const TextStyle(),
       ),
-       HomePage(),
+      HomePage(),
     ),
     ScreenHiddenDrawer(
         ItemHiddenMenu(

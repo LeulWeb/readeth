@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:logger/logger.dart';
+import 'package:readeth/bloc/book_bloc.dart';
+import 'package:readeth/bloc/book_event.dart';
+import 'package:readeth/bloc/book_state.dart';
+import 'package:readeth/config/genre_list.dart';
 import 'package:readeth/models/book_model.dart';
-import 'package:readeth/services/database_service.dart';
+import 'package:readeth/pages/book_detail_page.dart';
+
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:readeth/utils/show_toast.dart';
 
 class EditBookPage extends StatefulWidget {
   final BookModel book;
@@ -13,12 +19,12 @@ class EditBookPage extends StatefulWidget {
 
 class _EditBookPageState extends State<EditBookPage> {
   final _formKey = GlobalKey<FormState>();
-  final DatabaseService _databaseService = DatabaseService.instance;
 
   String title = '';
   String author = '';
   String description = '';
   String publishDate = '';
+  String selectedGenre = 'Miscellaneous';
 
   @override
   void initState() {
@@ -29,27 +35,8 @@ class _EditBookPageState extends State<EditBookPage> {
       author = widget.book.author;
       description = widget.book.description;
       publishDate = widget.book.publishDate;
+      selectedGenre = widget.book.genre;
     });
-  }
-
-  void _saveBook() async {
-    if (_formKey.currentState!.validate()) {
-      final book = BookModel(
-        id: widget.book.id,
-        title: title,
-        author: author,
-        description: description,
-        publishDate: publishDate,
-      );
-      Logger().d({
-        "id": widget.book.id,
-        "title": title,
-        "author": author,
-        "description": description,
-        "publishDate": publishDate,
-      });
-      _databaseService.updateBook(book);
-    }
   }
 
   @override
@@ -82,6 +69,25 @@ class _EditBookPageState extends State<EditBookPage> {
                     onChanged: (value) {
                       setState(() {
                         title = value.trim(); // Fixed assignment
+                      });
+                    },
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  DropdownButtonFormField(
+                    decoration: const InputDecoration(
+                      labelText: "Genre",
+                    ),
+                    items: genreList.map((String value) {
+                      return DropdownMenuItem(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                    onChanged: (value) {
+                      setState(() {
+                        selectedGenre = value as String;
                       });
                     },
                   ),
@@ -129,21 +135,52 @@ class _EditBookPageState extends State<EditBookPage> {
                   const SizedBox(
                     height: 20,
                   ),
-                  GestureDetector(
-                    onTap: _saveBook,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Color(0xffFFF279),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      width: double.infinity,
-                      alignment: Alignment.center,
-                      padding: const EdgeInsets.symmetric(vertical: 12.0),
-                      child: const Text(
-                        "Update Book",
-                        style: TextStyle(color: Colors.black),
-                      ),
-                    ),
+                  BlocBuilder<BookBloc, BookState>(
+                    builder: (context, state) {
+                      return GestureDetector(
+                        onTap: state is BookLoading
+                            ? null
+                            : () async {
+                                if (_formKey.currentState!.validate()) {
+                                  final book = BookModel(
+                                    id: widget.book.id,
+                                    title: title,
+                                    author: author,
+                                    description: description,
+                                    publishDate: publishDate,
+                                  );
+                                  context
+                                      .read<BookBloc>()
+                                      .add(UpdateBookEvent(book));
+
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                      builder: (context) =>
+                                          BookDetailPage(book: book)));
+                                  // show snack bar message
+                                  showScaffoldSnackBar(context,
+                                      "${book.title} is updated", Colors.green);
+                                }
+                              },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Color(0xffFFF279),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          width: double.infinity,
+                          alignment: Alignment.center,
+                          padding: const EdgeInsets.symmetric(vertical: 12.0),
+                          child: state is BookLoading
+                              ? const Text(
+                                  "Loading ...",
+                                  style: TextStyle(color: Colors.black),
+                                )
+                              : const Text(
+                                  "Update Book",
+                                  style: TextStyle(color: Colors.black),
+                                ),
+                        ),
+                      );
+                    },
                   )
                 ],
               ),
