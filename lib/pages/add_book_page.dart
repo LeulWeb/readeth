@@ -1,5 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:logger/logger.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:readeth/bloc/book_bloc.dart';
 import 'package:readeth/bloc/book_event.dart';
 import 'package:readeth/bloc/book_state.dart';
@@ -8,6 +12,7 @@ import 'package:readeth/models/book_model.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:readeth/utils/show_toast.dart';
 import 'package:readeth/widgets/app_drawer.dart';
+import 'package:path/path.dart';
 
 class AddBookPage extends StatefulWidget {
   const AddBookPage({super.key});
@@ -24,6 +29,27 @@ class _AddBookPageState extends State<AddBookPage> {
   String description = '';
   String publishDate = '';
   String selectedGenre = 'Miscellaneous';
+  String coverImagePath = '';
+
+  File? _imageFile;
+  final ImagePicker imagePicker = ImagePicker();
+
+  Future<void> _pickImage() async {
+    final pickedFile = await imagePicker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      final appDir = await getApplicationDocumentsDirectory();
+      final fileName = basename(pickedFile.path);
+      final savedImage =
+          await File(pickedFile.path).copy('${appDir.path}/$fileName');
+
+      setState(() {
+        _imageFile = savedImage; // Store the picked image file
+        coverImagePath = savedImage.path;
+      });
+      Logger().d(
+          'Image saved at: ${savedImage.path}'); // This path will be saved in SQLite
+    }
+  }
 
   @override
   void initState() {
@@ -120,6 +146,31 @@ class _AddBookPageState extends State<AddBookPage> {
                   const SizedBox(
                     height: 20,
                   ),
+                  if (_imageFile != null)
+                    Container(
+                      width: 200,
+                      height: 200,
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: FileImage(_imageFile!),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                  GestureDetector(
+                    onTap: () {},
+                    child: Container(
+                      child: IconButton(
+                        icon: const Icon(Icons.camera_alt_rounded),
+                        onPressed: () async {
+                          await _pickImage();
+                        },
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
                   BlocBuilder<BookBloc, BookState>(
                     builder: (context, state) {
                       return GestureDetector(
@@ -133,6 +184,7 @@ class _AddBookPageState extends State<AddBookPage> {
                                     description: description,
                                     publishDate: publishDate,
                                     genre: selectedGenre,
+                                    coverImage: coverImagePath,
                                   );
 
                                   Logger().d(book.toString());

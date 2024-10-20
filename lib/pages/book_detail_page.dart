@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:readeth/bloc/book_bloc.dart';
 import 'package:readeth/bloc/book_event.dart';
@@ -17,65 +19,114 @@ class BookDetailPage extends StatelessWidget {
     return Scaffold(
       body: Stack(
         children: [
-          // Background Container
-          Container(
-            width: double.infinity,
-            height: double.infinity,
-            decoration: const BoxDecoration(
-              image: DecorationImage(
-                colorFilter:
-                    ColorFilter.mode(Colors.black87, BlendMode.srcOver),
-                image: NetworkImage(
-                    "https://m.media-amazon.com/images/I/71OVB8HknWL._AC_UF1000,1000_QL80_.jpg"),
-                fit: BoxFit.cover,
-              ),
-            ),
+          // Background image
+          FutureBuilder<bool>(
+            future: File(book.coverImage ?? "").exists(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (snapshot.hasError) {
+                return const Text("Error checking file");
+              } else if (snapshot.data == true) {
+                return Container(
+                  width: double.infinity,
+                  height: double.infinity,
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                      colorFilter:
+                          ColorFilter.mode(Colors.black87, BlendMode.srcOver),
+                      image: FileImage(File(book.coverImage!)),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                );
+              } else {
+                return Container(
+                  width: double.infinity,
+                  height: double.infinity,
+                  decoration: const BoxDecoration(
+                    image: DecorationImage(
+                      colorFilter:
+                          ColorFilter.mode(Colors.black87, BlendMode.srcOver),
+                      image: NetworkImage(
+                          "https://m.media-amazon.com/images/I/71OVB8HknWL._AC_UF1000,1000_QL80_.jpg"),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                );
+              }
+            },
           ),
+
           // Book Details with scroll
-          SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  const SizedBox(height: 60), // Leave space for back button
-                  Center(
-                    child: Image.network(
-                      "https://m.media-amazon.com/images/I/71OVB8HknWL._AC_UF1000,1000_QL80_.jpg",
-                      width: 200,
-                      height: 400,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    book.title,
-                    style: const TextStyle(
-                      fontSize: 32,
-                    ),
-                  ),
-                  Text(book.author),
-                  Text(book.genre),
-                  Text(
-                    book.description,
-                    textAlign: TextAlign.justify,
-                  ),
-                  Text(book.publishDate),
-                  GestureDetector(
-                    onTap: () {
-                      showModal(context, book);
-                    },
-                    child: const Text(
-                      "Delete Book",
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: Colors.red,
+          Center(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment:
+                        MainAxisAlignment.center, // Center contents vertically
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      const SizedBox(height: 80), // Leave space for back button
+                      FutureBuilder<bool>(
+                        future: File(book.coverImage ?? "").exists(),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Center(
+                                child: CircularProgressIndicator());
+                          } else if (snapshot.hasError) {
+                            return const Text("Error checking file");
+                          } else if (snapshot.data == true) {
+                            return Image.file(
+                              File(book.coverImage!),
+                              fit: BoxFit.cover,
+                              width: 200,
+                              height: 300,
+                            );
+                          } else {
+                            return Image.network(
+                              "https://m.media-amazon.com/images/I/71OVB8HknWL._AC_UF1000,1000_QL80_.jpg",
+                              fit: BoxFit.cover,
+                              width: 200,
+                              height: 300,
+                            );
+                          }
+                        },
                       ),
-                    ),
+                      const SizedBox(
+                          height: 20), // Add space between image and text
+                      Text(
+                        book.title,
+                        style: const TextStyle(
+                          fontSize: 32,
+                        ),
+                      ),
+                      Text(book.author),
+                      Text(book.genre),
+                      Text(
+                        book.description,
+                        textAlign: TextAlign.justify,
+                      ),
+                      Text(book.publishDate),
+                      GestureDetector(
+                        onTap: () {
+                          showModal(context, book);
+                        },
+                        child: const Text(
+                          "Delete Book",
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Colors.red,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                    ],
                   ),
-                  const SizedBox(
-                    height: 20,
-                  )
-                ],
+                ),
               ),
             ),
           ),
@@ -123,7 +174,7 @@ void showModal(BuildContext context, BookModel book) {
           elevation: 10,
           icon: const Icon(Icons.delete),
           title: const Text("Delete Book"),
-          content: const Text("Are you sure you want to delete the book ?"),
+          content: const Text("Are you sure you want to delete the book?"),
           actions: [
             TextButton(
               onPressed: () {

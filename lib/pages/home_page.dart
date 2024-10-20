@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -14,7 +16,6 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
- 
       backgroundColor: Colors.black,
       drawer: AppDrawer(),
       body: Column(
@@ -39,20 +40,51 @@ class HomePage extends StatelessWidget {
                         childAspectRatio: 2 / 4,
                       ),
                       itemBuilder: (BuildContext context, int index) {
+                        final filePath = state.books[index].coverImage;
                         return GestureDetector(
                           onTap: () {
                             Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context) =>
-                                    BookDetailPage(book: state.books[index])));
+                              builder: (context) =>
+                                  BookDetailPage(book: state.books[index]),
+                            ));
                           },
                           child: GridTile(
                             child: Column(
                               children: [
-                                Image.network(
-                                    "https://m.media-amazon.com/images/I/71OVB8HknWL._AC_UF1000,1000_QL80_.jpg"),
+                                FutureBuilder<bool>(
+                                  future: File(filePath!).exists(),
+                                  builder: (context, snapshot) {
+                                    if (snapshot.connectionState ==
+                                        ConnectionState.waiting) {
+                                      return const Center(
+                                          child: CircularProgressIndicator());
+                                    } else if (snapshot.hasError) {
+                                      return const Text("Error checking file");
+                                    } else if (snapshot.data == true) {
+                                      return Container(
+                                        height: 200.0, // Set a fixed height
+                                        width: double.infinity,
+                                        child: Image.file(
+                                          File(filePath),
+                                          fit: BoxFit
+                                              .cover, // Use cover to maintain aspect ratio
+                                        ),
+                                      );
+                                    } else {
+                                      return Container(
+                                        height: 200.0, // Set a fixed height
+                                        width: double.infinity,
+                                        child: Image.network(
+                                          "https://m.media-amazon.com/images/I/71OVB8HknWL._AC_UF1000,1000_QL80_.jpg",
+                                          fit: BoxFit
+                                              .cover, // Use cover to maintain aspect ratio
+                                        ),
+                                      );
+                                    }
+                                  },
+                                ),
                                 Text(state.books[index].title),
-                                Text(state.books[index].id.toString()),
-                                Text(state.books[index].author)
+                                Text(state.books[index].author),
                               ],
                             ),
                           ),
