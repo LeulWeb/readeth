@@ -25,6 +25,7 @@ class DatabaseService {
   Future<Database> getDatabase() async {
     // location where the database is stored db path
     final dbDirPath = await getDatabasesPath();
+    Logger().i(dbDirPath);
     final dbPath = join(dbDirPath, 'readeth.db');
 
     final database = await openDatabase(dbPath, version: 1,
@@ -44,6 +45,7 @@ class DatabaseService {
 
   Future<void> addBook(BookModel book) async {
     final db = await database;
+
     await db.insert(tableName, {
       columnTitle: book.title,
       columnAuthor: book.author,
@@ -56,7 +58,32 @@ class DatabaseService {
     final db = await database;
     final data = await db.query(tableName);
     Logger().d(data);
-    List<BookModel> bookList = (data as List<Map<String, dynamic>>).map((e)=> BookModel.fromMap(e)).toList();
+    List<BookModel> bookList = (data as List<Map<String, dynamic>>)
+        .map((e) => BookModel.fromMap(e))
+        .toList();
+    Logger().w(bookList);
     return bookList;
+  }
+
+  Future<void> updateBook(BookModel book) async {
+    Logger().w(book.id);
+    final db = await database;
+    await db.update(
+        tableName,
+        {
+          columnTitle: book.title,
+          columnAuthor: book.author,
+          columnDescription: book.description,
+          columnPublishDate: book.publishDate,
+        },
+        where: "$columnId = ?",
+        whereArgs: [book.id]);
+    Logger().d("Book updated");
+  }
+
+  Future<void> deleteBook(int id) async {
+    final db = await database;
+    await db.delete(tableName, where: "$columnId = ?", whereArgs: [id]);
+    Logger().d("Book deleted");
   }
 }

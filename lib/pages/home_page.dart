@@ -48,8 +48,9 @@ class HomePage extends StatelessWidget {
                           child: Column(
                             children: [
                               Image.network(
-                                  "https://www.designforwriters.com/wp-content/uploads/2017/10/design-for-writers-book-cover-tf-2-a-million-to-one.jpg"),
+                                  "https://m.media-amazon.com/images/I/71OVB8HknWL._AC_UF1000,1000_QL80_.jpg"),
                               Text(snapshot.data![index].title),
+                              Text(snapshot.data![index].id.toString()),
                               Text(snapshot.data![index].author)
                             ],
                           ),
