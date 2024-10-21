@@ -15,7 +15,6 @@ import 'package:readeth/widgets/app_drawer.dart';
 import 'package:path/path.dart';
 import 'package:file_picker/file_picker.dart';
 
-
 class AddBookPage extends StatefulWidget {
   const AddBookPage({super.key});
 
@@ -76,6 +75,10 @@ class _AddBookPageState extends State<AddBookPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text("Add Book"),
+        centerTitle: true,
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: ListView(

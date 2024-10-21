@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:readeth/bloc/book_bloc.dart';
 import 'package:readeth/bloc/book_event.dart';
+import 'package:readeth/pages/splash_page.dart';
 import 'package:readeth/widgets/app_drawer.dart';
 
 void main() => runApp(MyApp());
@@ -22,7 +23,7 @@ class MyApp extends StatelessWidget {
         darkTheme: ThemeData.dark(
           useMaterial3: true,
         ),
-        home: AppDrawer(),
+        home: SplashPage(),
       ),
     );
   }

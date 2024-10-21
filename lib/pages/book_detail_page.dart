@@ -13,7 +13,6 @@ import 'package:readeth/pages/pdf_viewer_page.dart';
 import 'package:readeth/utils/show_toast.dart';
 import 'package:readeth/widgets/app_drawer.dart';
 
-
 class BookDetailPage extends StatelessWidget {
   final BookModel book;
   const BookDetailPage({super.key, required this.book});
@@ -52,8 +51,7 @@ class BookDetailPage extends StatelessWidget {
                     image: DecorationImage(
                       colorFilter:
                           ColorFilter.mode(Colors.black87, BlendMode.srcOver),
-                      image: NetworkImage(
-                          "https://m.media-amazon.com/images/I/71OVB8HknWL._AC_UF1000,1000_QL80_.jpg"),
+                      image: AssetImage("assets/images/default.jpg"),
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -91,8 +89,8 @@ class BookDetailPage extends StatelessWidget {
                               height: 300,
                             );
                           } else {
-                            return Image.network(
-                              "https://m.media-amazon.com/images/I/71OVB8HknWL._AC_UF1000,1000_QL80_.jpg",
+                            return Image.asset(
+                              "assets/images/default.jpg",
                               fit: BoxFit.cover,
                               width: 200,
                               height: 300,
